@@ -162,11 +162,14 @@ def blockCollision(blocks, player):
     for block in blocks:
         if player.rect.colliderect(block.rect):
             # Update player's position to previous position before collision
-            player.rect.x = player.rect.x - 2
-            player.rect.y = player.rect.y - 2
-            # player.current_health -= 0.5
-            touch_sound = pygame.mixer.Sound("assets/Sounds/Touch.wav")
-            touch_sound.play()
+            if player.type == "tank":
+                player.rect.x = player.rect.x - 2
+                player.rect.y = player.rect.y - 2
+                # player.current_health -= 0.5
+                touch_sound = pygame.mixer.Sound("assets/Sounds/Touch.wav")
+                touch_sound.play()
+            # if player.type == "bullet":
+            #     blocks.remove(block)
 
 
 def print_text(message, x, y, rect_width, rect_height, font_color=BLACK, font_type="freesansbold.ttf", font_size=30):
@@ -217,9 +220,9 @@ def choose_map():
             if event.type == pygame.QUIT:
                 quit()
 
-        screen.blit(maps[0].image, (100, 100))
-        screen.blit(maps[1].image, (500, 100))
-        screen.blit(maps[2].image, (900, 100))
+        screen.blit(maps[0].image, (140, 200))
+        screen.blit(maps[1].image, (540, 200))
+        screen.blit(maps[2].image, (940, 200))
 
         map_1_btn.draw(100, 400, maps[0].name, lambda: start_game(0), font_size=30)
         map_2_btn.draw(500, 400, maps[1].name, lambda: start_game(1), font_size=30)
@@ -263,7 +266,7 @@ if game_map == maps[1]:
 # Dirt
 if game_map == maps[2]:
     image = "assets/PNG/Obstacles/sandbagBeige"
-for _ in range(5):
+for _ in range(20):
     while True:
         x = randint(0, SCREEN_WIDTH // TILE - 1) * TILE
         y = randint(0, SCREEN_HEIGHT // TILE - 1) * TILE
@@ -292,7 +295,16 @@ for _ in range(5):
     map_objects.append(Block(x, y, TILE, image2))
 
 
-# sand grass dirt
+def bulletBlockCollision(bullets):
+    # Bullet movement and collision with blocks
+    for bullet in bullets:
+        bullet.update()
+        for block in map_objects:
+            if bullet.rect.colliderect(block.rect):
+                bullets.remove(bullet)
+                map_objects.remove(block)
+
+
 def main_game_loop():
     # Game loop
     global running
@@ -361,7 +373,8 @@ def main_game_loop():
 
         for block in map_objects:
             block.draw(screen)
-
+        bulletBlockCollision(bullets_1)
+        bulletBlockCollision(bullets_2)
         blockCollision(map_objects, player_1)
         blockCollision(map_objects, player_2)
         # Check collision between players' bullets and current health for each
