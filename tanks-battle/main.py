@@ -13,7 +13,7 @@ SCREEN_WIDTH = 1200
 SCREEN_HEIGHT = 600
 PLAYER_SPEED = 0.1
 TANK_SIZE = 64
-TILE = 32
+TILE = 48
 # Colors
 BLACK = (0, 0, 0)
 RED = (255, 0, 0)
@@ -142,7 +142,6 @@ def isCollision(bullets_player, player_enemy, player_num):
             explosion_img = pygame.image.load("assets/png2/explosion.png")
             screen.blit(explosion_img, player_enemy.rect)
             player_enemy.current_health -= 1
-            print(player_enemy.current_health)
 
             try:
                 bullets_player.remove(bullet)
@@ -157,6 +156,17 @@ def isCollision(bullets_player, player_enemy, player_num):
                 pass
         else:
             bullet.draw(screen)
+
+
+def blockCollision(blocks, player):
+    for block in blocks:
+        if player.rect.colliderect(block.rect):
+            # Update player's position to previous position before collision
+            player.rect.x = player.rect.x - 2
+            player.rect.y = player.rect.y - 2
+            # player.current_health -= 0.5
+            touch_sound = pygame.mixer.Sound("assets/Sounds/Touch.wav")
+            touch_sound.play()
 
 
 def print_text(message, x, y, rect_width, rect_height, font_color=BLACK, font_type="freesansbold.ttf", font_size=30):
@@ -224,17 +234,65 @@ def start_game(map_index):
     main_game_loop()
 
 
+def check_player_block_collisions(player, blocks):
+    for block in blocks:
+        if player.rect.colliderect(block.rect):
+            # Update player's position to previous position before collision
+            player.rect.x = player.prev_x
+            player.rect.y = player.prev_y
+
+
+def check_bullet_block_collisions(bullets, blocks):
+    for bullet in bullets:
+        for block in blocks:
+            if bullet.rect.colliderect(block.rect):
+                # Remove the block from the blocks list
+                blocks.remove(block)
+                # Remove the bullet from the bullets list
+                bullets.remove(bullet)
+
+
 # Create blocks placement
-# for _ in range(10):
-#     while True:
-#         x = randint(0, SCREEN_WIDTH // TILE - 1) * TILE
-#         y = randint(0, SCREEN_HEIGHT // TILE - 1) * TILE
-#         rect = pygame.Rect(x, y, TILE, TILE)
-#         found = False
-#         for
-# block = Block(100, 100, TILE, "assets/PNG/Environment/treeSmall.png")
+map_objects = []
+# Sand
+image = "assets/PNG/Obstacles/sandbagBrown.png"
+image2 = "assets/PNG/Environment/treeSmall.png"
+# Grass
+if game_map == maps[1]:
+    image = "assets/PNG/Obstacles/barrelGrey_sde_rust.png"
+# Dirt
+if game_map == maps[2]:
+    image = "assets/PNG/Obstacles/sandbagBeige"
+for _ in range(5):
+    while True:
+        x = randint(0, SCREEN_WIDTH // TILE - 1) * TILE
+        y = randint(0, SCREEN_HEIGHT // TILE - 1) * TILE
+        rect = pygame.Rect(x, y, TILE, TILE)
+        found = False
+        for obj in map_objects:
+            if rect.colliderect(obj.rect):
+                found = True
+        if not found:
+            break
+
+    map_objects.append(Block(x, y, TILE, image))
+    # map_objects.append(Block(x, y, TILE, image2))
+for _ in range(5):
+    while True:
+        x = randint(0, SCREEN_WIDTH // TILE - 1) * TILE
+        y = randint(0, SCREEN_HEIGHT // TILE - 1) * TILE
+        rect = pygame.Rect(x, y, TILE, TILE)
+        found = False
+        for obj in map_objects:
+            if rect.colliderect(obj.rect):
+                found = True
+        if not found:
+            break
+
+    map_objects.append(Block(x, y, TILE, image2))
 
 
+# sand grass dirt
 def main_game_loop():
     # Game loop
     global running
@@ -300,11 +358,12 @@ def main_game_loop():
         player_1.draw(screen)
         player_2.update(dt)
         player_2.draw(screen)
-        block.draw(screen)
-        # mouse_pos = pygame.mouse.get_pos()
-        # print("Mouse position:", mouse_pos)
-        # print(player_1.rect)
 
+        for block in map_objects:
+            block.draw(screen)
+
+        blockCollision(map_objects, player_1)
+        blockCollision(map_objects, player_2)
         # Check collision between players' bullets and current health for each
         isCollision(bullets_2, player_1, 2)
         isCollision(bullets_1, player_2, 1)

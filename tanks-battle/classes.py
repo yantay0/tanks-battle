@@ -9,6 +9,9 @@ class Block:
         self.blocks.append(self)
         self.rect = pygame.Rect(x, y, size, size)
         self.image = pygame.image.load(img_path).convert_alpha()
+        self.current_health = 1
+        self.max_health = 1
+        self.type = "block"
 
     def update(self):
         pass
@@ -24,6 +27,7 @@ class Map:
     def __init__(self, name, img_path):
         self.name = name
         self.image = pygame.image.load(img_path)
+
 
     def create_game_map(self):
         # dirt, sand, grass
@@ -56,6 +60,7 @@ class Player:
         self.barrel_right = pygame.image.load(barrel_right_path)
         self.barrel_image = None
         self.barrel_pos = None
+        self.type = "tank"
 
     def calculate_barrel_position(self):
         # Calculate the position to draw the barrel image
@@ -115,7 +120,7 @@ class Bullet:
         self.speed = 10
         self.state = "ready"
         self.set_image_direction(direction)
-
+        self.type = "bullet"
     def set_image_direction(self, direction):
         if direction == "right":
             self.image = pygame.image.load("assets/png2/bullet_right.png")
