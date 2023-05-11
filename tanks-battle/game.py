@@ -30,12 +30,12 @@ pygame.display.set_caption('Tanks Battle')
 pygame.display.set_icon(icon)
 
 # Create the players
-player_1 = Player('assets/PNG/Tanks/tankBlue.png', 0, (SCREEN_HEIGHT - TANK_SIZE) / 2,
+player_1 = Player('assets/PNG/Tanks/tankBlue.png', 10, (SCREEN_HEIGHT - TANK_SIZE) / 2,
                   "right", "assets/PNG/Tanks/barrelBlue_up.png",
                   "assets/PNG/Tanks/barrelBlue_left.png",
                   "assets/PNG/Tanks/barrelBlue_down.png",
                   "assets/PNG/Tanks/barrelBlue_right.png")
-player_2 = Player('assets/PNG/Tanks/tankGreen.png', SCREEN_WIDTH - TANK_SIZE, (SCREEN_HEIGHT - TANK_SIZE) / 2,
+player_2 = Player('assets/PNG/Tanks/tankGreen.png', SCREEN_WIDTH - TANK_SIZE - 15, (SCREEN_HEIGHT - TANK_SIZE) / 2,
                   "left", "assets/PNG/Tanks/barrelGreen_up.png",
                   "assets/PNG/Tanks/barrelGreen_left.png",
                   "assets/PNG/Tanks/barrelGreen_down.png",
@@ -65,9 +65,9 @@ KEY_S = pygame.K_s
 KEY_W = pygame.K_w
 KEY_F = pygame.K_f
 
-map_1 = Map("Sandy Oasis", "assets/PNG/Environment/sand.png")
-map_2 = Map("Green Valley", "assets/PNG/Environment/grass.png")
-map_3 = Map("Dusty Hills", "assets/PNG/Environment/dirt.png")
+map_1 = Map("Sandy Oasis", "assets/png2/sand.png", "assets/PNG/Environment/sand.png")
+map_2 = Map("Green Valley", "assets/png2/grass.png", "assets/PNG/Environment/grass.png")
+map_3 = Map("Dusty Hills", "assets/png2/dirt.png", "assets/PNG/Environment/dirt.png")
 maps = (map_1, map_2, map_3)
 game_map = maps[0]
 
@@ -190,16 +190,10 @@ def print_text(message, x, y, rect_width, rect_height, font_color=BLACK, font_ty
     screen.blit(text, text_rect)
 
 
-def display_map_options():
-    # Create a new Pygame menu
-    pass
-
-
 def show_menu():
     menu_bckgr = pygame.image.load("assets/png2/menu.png")
 
     start_btn = Button(300, 70)
-    select_map_btn = Button(200, 70)
     quit_btn = Button(200, 70)
     show = True
     while show:
@@ -209,8 +203,7 @@ def show_menu():
                 quit()
         screen.blit(menu_bckgr, (0, 0))
         start_btn.draw(450, 200, "Start game", choose_map, 40)
-
-        quit_btn.draw(500, 400, "Quit", quit, 40)
+        quit_btn.draw(500, 350, "Quit", quit, 40)
         pygame.display.update()
         clock.tick(60)
 
@@ -223,17 +216,18 @@ def choose_map():
     end = False
     while not end:
         screen.blit(menu_bckgr, (0, 0))
+        print_text(message="Choose Map", x=525, y=25, rect_height=70, rect_width=150, font_size=50)
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 quit()
 
-        screen.blit(maps[0].image, (140, 200))
-        screen.blit(maps[1].image, (540, 200))
-        screen.blit(maps[2].image, (940, 200))
+        screen.blit(maps[0].image, (50, 100))
+        screen.blit(maps[1].image, (425, 100))
+        screen.blit(maps[2].image, (800, 100))
 
-        map_1_btn.draw(100, 400, maps[0].name, lambda: start_game(0), font_size=30)
-        map_2_btn.draw(500, 400, maps[1].name, lambda: start_game(1), font_size=30)
-        map_3_btn.draw(900, 400, maps[2].name, lambda: start_game(2), font_size=30)
+        map_1_btn.draw(100, 500, maps[0].name, lambda: start_game(0), font_size=30)
+        map_2_btn.draw(500, 500, maps[1].name, lambda: start_game(1), font_size=30)
+        map_3_btn.draw(900, 500, maps[2].name, lambda: start_game(2), font_size=30)
         pygame.display.update()
         clock.tick(60)
 
@@ -244,7 +238,7 @@ def start_game(map_index):
 
     map_objects.append(player_1)
     map_objects.append(player_2)
-    for _ in range(20):
+    for _ in range(30):
         while True:
             x = randint(0, SCREEN_WIDTH // TILE - 1) * TILE
             y = randint(0, SCREEN_HEIGHT // TILE - 1) * TILE
@@ -268,7 +262,7 @@ def start_game(map_index):
             image = "assets/PNG/Obstacles/sandbagBeige.png"
         map_objects.append(Block(x, y, TILE, image))
         # map_objects.append(Block(x, y, TILE, image2))
-    for _ in range(5):
+    for _ in range(6):
         while True:
             x = randint(0, SCREEN_WIDTH // TILE - 1) * TILE
             y = randint(0, SCREEN_HEIGHT // TILE - 1) * TILE
@@ -291,7 +285,7 @@ def start_game(map_index):
             image = "assets/PNG/Obstacles/sandbagBeige"
         map_objects.append(Block(x, y, TILE, image2))
 
-    for _ in range(4):
+    for _ in range(5):
         while True:
             x = randint(0, SCREEN_WIDTH // TILE - 1) * TILE
             y = randint(0, SCREEN_HEIGHT // TILE - 1) * TILE

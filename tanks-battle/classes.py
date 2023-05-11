@@ -24,18 +24,20 @@ class Block:
 
 
 class Map:
-    def __init__(self, name, img_path):
+    def __init__(self, name, img_path, tile_img):
         self.name = name
         self.image = pygame.image.load(img_path)
+        self.image = pygame.transform.scale(self.image, (350, 350))
+        self.tile_img = pygame.image.load(tile_img)
 
     def create_game_map(self):
         # dirt, sand, grass
         # Create a game map surface and fill it with the grass image
         map_width, map_height = 1200, 600
         game_map = pygame.Surface((map_width, map_height))
-        for x in range(0, map_width, self.image.get_width()):
-            for y in range(0, map_height, self.image.get_height()):
-                game_map.blit(self.image, (x, y))
+        for x in range(0, map_width, self.tile_img.get_width()):
+            for y in range(0, map_height, self.tile_img.get_height()):
+                game_map.blit(self.tile_img, (x, y))
         return game_map
 
 
