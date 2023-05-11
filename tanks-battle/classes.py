@@ -2,6 +2,40 @@ import pygame
 from pygame import mixer
 
 
+class Block:
+    blocks = []
+
+    def __init__(self, x, y, size, img_path):
+        self.blocks.append(self)
+        self.rect = pygame.Rect(x, y, size, size)
+        self.image = pygame.image.load(img_path).convert_alpha()
+
+    def update(self):
+        pass
+
+    def draw(self, screen):
+        screen.blit(self.image, self.rect)
+
+    def damage(self, value):
+        self.blocks.remove(self)
+
+
+class Map:
+    def __init__(self, name, img_path):
+        self.name = name
+        self.image = pygame.image.load(img_path)
+
+    def create_game_map(self):
+        # dirt, sand, grass
+        # Create a game map surface and fill it with the grass image
+        map_width, map_height = 1200, 600
+        game_map = pygame.Surface((map_width, map_height))
+        for x in range(0, map_width, self.image.get_width()):
+            for y in range(0, map_height, self.image.get_height()):
+                game_map.blit(self.image, (x, y))
+        return game_map
+
+
 class Player:
     def __init__(self, img_path, x, y, direction, barrel_up_path, barrel_left_path, barrel_down_path,
                  barrel_right_path):
@@ -124,5 +158,3 @@ class Bullet:
     def draw(self, screen):
         if self.state == "fire":
             screen.blit(self.image, self.rect)
-
-

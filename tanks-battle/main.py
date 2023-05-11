@@ -1,10 +1,9 @@
-from idlelib import mainmenu
-
 import pygame
 import pygame_menu
 from pygame import mixer
+from random import randint
 from pygame_menu import themes
-from classes import Player, Bullet
+from classes import Player, Bullet, Map, Block
 
 pygame.init()
 running = True
@@ -14,7 +13,7 @@ SCREEN_WIDTH = 1200
 SCREEN_HEIGHT = 600
 PLAYER_SPEED = 0.1
 TANK_SIZE = 64
-
+TILE = 32
 # Colors
 BLACK = (0, 0, 0)
 RED = (255, 0, 0)
@@ -65,15 +64,11 @@ KEY_S = pygame.K_s
 KEY_W = pygame.K_w
 KEY_F = pygame.K_f
 
-# Load the image
-grass_image = pygame.image.load("assets/PNG/Environment/grass.png")
-# dirt, sand, grass
-# Create a game map surface and fill it with the grass image
-map_width, map_height = SCREEN_WIDTH, SCREEN_HEIGHT
-game_map = pygame.Surface((map_width, map_height))
-for x in range(0, map_width, grass_image.get_width()):
-    for y in range(0, map_height, grass_image.get_height()):
-        game_map.blit(grass_image, (x, y))
+map_1 = Map("Sandy Oasis", "assets/PNG/Environment/sand.png")
+map_2 = Map("Green Valley", "assets/PNG/Environment/grass.png")
+map_3 = Map("Dusty Hills", "assets/PNG/Environment/dirt.png")
+maps = (map_1, map_2, map_3)
+game_map = maps[0]
 
 
 class Button:
@@ -84,7 +79,7 @@ class Button:
         self.active_color = (23, 204, 58)
         self.clicked = False
 
-    def draw(self, x, y, message, action=None, font_size=30):
+    def draw(self, x, y, message, action=None, font_size=40):
         mouse = pygame.mouse.get_pos()
         click = pygame.mouse.get_pressed()
         button_rect = pygame.Rect(x, y, self.width, self.height)
@@ -105,7 +100,7 @@ class Button:
             pygame.draw.rect(screen, self.inactive_color, button_rect)
             self.clicked = False
 
-        print_text(message=message, x=x + 15, y=y + 10, font_size=font_size)
+        print_text(message=message, x=x, rect_width=self.width, rect_height=self.height, y=y, font_size=font_size)
 
 
 def game_over(winner):
@@ -164,17 +159,27 @@ def isCollision(bullets_player, player_enemy, player_num):
             bullet.draw(screen)
 
 
-def print_text(message, x, y, font_color=BLACK, font_type="freesansbold.ttf", font_size=30):
+def print_text(message, x, y, rect_width, rect_height, font_color=BLACK, font_type="freesansbold.ttf", font_size=30):
     font_type = pygame.font.Font(font_type, font_size)
     text = font_type.render(message, True, font_color)
+    text_rect = text.get_rect()
 
-    screen.blit(text, (x, y))
+    # Center the text inside the given rect
+    text_rect.center = (x + rect_width // 2, y + rect_height // 2)
+
+    screen.blit(text, text_rect)
+
+
+def display_map_options():
+    # Create a new Pygame menu
+    pass
 
 
 def show_menu():
     menu_bckgr = pygame.image.load("assets/png2/menu.png")
 
     start_btn = Button(300, 70)
+    select_map_btn = Button(200, 70)
     quit_btn = Button(200, 70)
     show = True
     while show:
@@ -183,14 +188,51 @@ def show_menu():
                 pygame.quit()
                 quit()
         screen.blit(menu_bckgr, (0, 0))
-        start_btn.draw(450, 200, "Start game", start_game, 50)
-        quit_btn.draw(500, 300, "Quit", quit, 50)
+        start_btn.draw(450, 200, "Start game", choose_map, 40)
+        # select_map_btn.draw(500, 300, "Maps", 40)
+        quit_btn.draw(500, 400, "Quit", quit, 40)
         pygame.display.update()
         clock.tick(60)
 
 
-def start_game():
+def choose_map():
+    map_1_btn = Button(200, 60)
+    map_2_btn = Button(200, 60)
+    map_3_btn = Button(200, 60)
+    menu_bckgr = pygame.image.load("assets/png2/menu.png")
+    end = False
+    while not end:
+        screen.blit(menu_bckgr, (0, 0))
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                quit()
+
+        screen.blit(maps[0].image, (100, 100))
+        screen.blit(maps[1].image, (500, 100))
+        screen.blit(maps[2].image, (900, 100))
+
+        map_1_btn.draw(100, 400, maps[0].name, lambda: start_game(0), font_size=30)
+        map_2_btn.draw(500, 400, maps[1].name, lambda: start_game(1), font_size=30)
+        map_3_btn.draw(900, 400, maps[2].name, lambda: start_game(2), font_size=30)
+        pygame.display.update()
+        clock.tick(60)
+
+
+def start_game(map_index):
+    global game_map
+    game_map = maps[map_index]
     main_game_loop()
+
+
+# Create blocks placement
+# for _ in range(10):
+#     while True:
+#         x = randint(0, SCREEN_WIDTH // TILE - 1) * TILE
+#         y = randint(0, SCREEN_HEIGHT // TILE - 1) * TILE
+#         rect = pygame.Rect(x, y, TILE, TILE)
+#         found = False
+#         for
+# block = Block(100, 100, TILE, "assets/PNG/Environment/treeSmall.png")
 
 
 def main_game_loop():
@@ -200,7 +242,7 @@ def main_game_loop():
         # screen color
         screen.fill(BLACK)
         # Draw the game map onto the screen
-        screen.blit(game_map, (0, 0))
+        screen.blit(game_map.create_game_map(), (0, 0))
 
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
@@ -258,6 +300,7 @@ def main_game_loop():
         player_1.draw(screen)
         player_2.update(dt)
         player_2.draw(screen)
+        block.draw(screen)
         # mouse_pos = pygame.mouse.get_pos()
         # print("Mouse position:", mouse_pos)
         # print(player_1.rect)
