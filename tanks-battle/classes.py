@@ -28,7 +28,6 @@ class Map:
         self.name = name
         self.image = pygame.image.load(img_path)
 
-
     def create_game_map(self):
         # dirt, sand, grass
         # Create a game map surface and fill it with the grass image
@@ -112,6 +111,24 @@ class Player:
         self.check_borders()
 
 
+class HealthBonus:
+    def __init__(self, x, y, size, img_path):
+        self.rect = pygame.Rect(x, y, size, size)
+        self.image = pygame.image.load(img_path).convert_alpha()
+        self.current_health = 1
+        self.max_health = 1
+        self.type = "bonus"
+
+    def draw(self, screen):
+        screen.blit(self.image, self.rect)
+
+    def apply(self, player):
+        if player.current_health == player.max_health:
+            pass
+        else:
+            player.current_health += 1
+
+
 class Bullet:
     def __init__(self, direction):
         self.image = None  # will be set when firing the bullet
@@ -121,6 +138,7 @@ class Bullet:
         self.state = "ready"
         self.set_image_direction(direction)
         self.type = "bullet"
+
     def set_image_direction(self, direction):
         if direction == "right":
             self.image = pygame.image.load("assets/png2/bullet_right.png")
