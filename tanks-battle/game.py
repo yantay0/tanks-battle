@@ -1,8 +1,8 @@
-import pygame
-import pygame_menu
-from pygame import mixer
 from random import randint
-from pygame_menu import themes
+
+import pygame
+from pygame import mixer
+
 from classes import Player, Bullet, Map, Block, HealthBonus
 
 pygame.init()
